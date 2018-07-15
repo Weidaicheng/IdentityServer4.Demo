@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MVCClient.Models;
+using Refit;
 
 namespace MVCClient.Controllers
 {
@@ -17,7 +18,7 @@ namespace MVCClient.Controllers
             return View();
         }
 
-        [Authorize]
+        [Microsoft.AspNetCore.Authorization.Authorize]
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -42,6 +43,16 @@ namespace MVCClient.Controllers
             await HttpContext.SignOutAsync("Cookies");
             await HttpContext.SignOutAsync("oidc");
             return Content("Logout");
+        }
+
+        public async Task<IActionResult> CallApiUsingUserAccessToken()
+        {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+
+            var identityApi = RestService.For<IIdentityApi>("http://localhost:5001");
+            var result = await identityApi.Identity($"Bearer {accessToken}");
+
+            return Json(result);
         }
     }
 }
