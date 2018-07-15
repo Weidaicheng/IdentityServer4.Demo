@@ -16,9 +16,16 @@ namespace Client
 
         private static async void foo()
         {
+            //从元数据中发现客户端
             var disco = await DiscoveryClient.GetAsync("http://localhost:5000");
-            var tokenClient = new TokenClient(disco.TokenEndpoint, "client", "secret");
-            var tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
+
+            //请求令牌
+            //通过客户端
+            //var tokenClient = new TokenClient(disco.TokenEndpoint, "client", "secret");
+            //var tokenResponse = await tokenClient.RequestClientCredentialsAsync("api1");
+            //通过密码
+            var tokenClient = new TokenClient(disco.TokenEndpoint, "ro.client", "secret");
+            var tokenResponse = await tokenClient.RequestResourceOwnerPasswordAsync("alice", "password");
 
             if(tokenResponse.IsError)
             {
